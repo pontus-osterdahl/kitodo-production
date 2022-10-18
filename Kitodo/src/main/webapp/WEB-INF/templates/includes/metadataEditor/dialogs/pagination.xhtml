@@ -206,6 +206,15 @@
                                                      style="margin-bottom: 0;"
                                                      value="#{DataEditorForm.paginationPanel.fictitiousCheckboxChecked}"/>
                         </div>
+                        <div>
+                            <p:outputLabel for="reversePaginationCheckbox"
+                                           value="#{msgs.reversePagination}"/>
+                            <p:selectBooleanCheckbox id="reversePaginationCheckbox"
+                                                     disabled="#{not SecurityAccessController.hasAuthorityToEditProcessPagination()}"
+                                                     styleClass="input switch"
+                                                     style="margin-bottom: 0;"
+                                                     value="#{DataEditorForm.paginationPanel.reverseCheckboxChecked}"/>
+                        </div>
                     </p:row>
                 </p:panelGrid>
             </p:panel>
