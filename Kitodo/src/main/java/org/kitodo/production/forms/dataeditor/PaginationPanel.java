@@ -47,6 +47,7 @@ public class PaginationPanel {
 
     private final DataEditorForm dataEditor;
     private boolean fictitiousCheckboxChecked = false;
+    private boolean reverseCheckboxChecked = false;
     private List<SelectItem> paginationSelectionItems;
     private List<Integer> paginationSelectionSelectedItems = new ArrayList<>();
     private String paginationStartValue = "1";
@@ -269,7 +270,26 @@ public class PaginationPanel {
     public void setFictitiousCheckboxChecked(boolean fictitiousCheckboxChecked) {
         this.fictitiousCheckboxChecked = fictitiousCheckboxChecked;
     }
-
+    
+    /**
+    * Returns whether the reverseCheckbox is checked.
+    * 
+    * @return whether the reverseCheckbox is checked
+    *
+    */
+    public void isReverseCheckChecked() {
+        return reverseCheckboxChecked;
+    }
+    
+    /**
+    * Sets whether the reverseCheckbox is checked.
+    * 
+    * @param reverseCheckboxChecked;
+    */
+    public void setReverseCheckboxChecked(boolean reverseCheckboxChecked) {
+        this.reverseCheckboxChecked = reverseCheckboxChecked;
+    }
+        
     private void preparePaginationSelectionItems() {
         List<PhysicalDivision> physicalDivisions = dataEditor.getWorkpiece().getAllPhysicalDivisionChildrenFilteredByTypePageAndSorted();
         paginationSelectionItems = new ArrayList<>(physicalDivisions.size());
@@ -346,13 +366,26 @@ public class PaginationPanel {
                 paginationStartValue, fictitiousCheckboxChecked, pageSeparators.get(0).getSeparatorString());
         Paginator paginator = new Paginator(initializer);
         List<PhysicalDivision> physicalDivisions = dataEditor.getWorkpiece().getAllPhysicalDivisionChildrenFilteredByTypePageAndSorted();
-        if (selectPaginationScopeSelectedItem) {
-            for (int i = paginationSelectionSelectedItems.get(0); i < physicalDivisions.size(); i++) {
-                physicalDivisions.get(i).setOrderlabel(paginator.next());
+        if (reverseCheckboxChecked) {
+            if (selectPaginationScopeSelectedItem) {
+                for (int i = paginationSelectionSelectedItems.get(paginationSelectionSelectedItems.size() -1); i >= 0; i--) {
+                    physicalDivisions.get(i).setOrderlabel(paginator.next());
+                }
+            } else {
+                for (int i = paginationSelectionSelectedItems.size() - 1; i >= 0; i--) {
+                    physicalDivisions.get(paginationSelectionSelectedItems.get(i)).setOrderlabel(paginator.next());
+                }
             }
-        } else {
-            for (int i : paginationSelectionSelectedItems) {
-                physicalDivisions.get(i).setOrderlabel(paginator.next());
+        }
+        else {
+            if (selectPaginationScopeSelectedItem) {
+                for (int i = paginationSelectionSelectedItems.get(0); i < physicalDivisions.size(); i++) {
+                    physicalDivisions.get(i).setOrderlabel(paginator.next());
+                }
+            } else {
+                for (int i : paginationSelectionSelectedItems) {
+                    physicalDivisions.get(i).setOrderlabel(paginator.next());
+                }
             }
         }
         paginationSelectionSelectedItems = new ArrayList<>();
@@ -385,6 +418,7 @@ public class PaginationPanel {
         selectPaginationModeSelectedItem = null;
         paginationStartValue = "1";
         fictitiousCheckboxChecked = false;
+        reverseCheckboxChecked = false;
         selectPaginationScopeSelectedItem = Boolean.TRUE;
         preparePaginationSelectionItems();
         preparePaginationSelectionSelectedItems();
