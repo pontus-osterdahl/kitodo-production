@@ -198,10 +198,12 @@ public class MetadataEditor {
             if (Objects.isNull(newStructure)) {
                 continue;
             }
-            MetadataEntry metadataEntry = new MetadataEntry();
-            metadataEntry.setKey(metadataKey);
-            metadataEntry.setValue(metadataValue + " " + (number - i));
-            newStructure.getMetadata().add(metadataEntry);
+            if (!metadataKey.isEmpty()) {
+                MetadataEntry metadataEntry = new MetadataEntry();
+                metadataEntry.setKey(metadataKey);
+                metadataEntry.setValue(metadataValue + " " + (number - i));
+                newStructure.getMetadata().add(metadataEntry);
+            }
         }
     }
 
