@@ -195,15 +195,13 @@ public class MetadataEditor {
 
         for (int i = 0; i < number; i++) {
             LogicalDivision newStructure = addLogicalDivision(type, workpiece, structure, position, Collections.emptyList());
-            if (Objects.isNull(newStructure)) {
+            if (Objects.isNull(newStructure) || metadataKey.isEmpty()) {
                 continue;
             }
-            if (!metadataKey.isEmpty()) {
-                MetadataEntry metadataEntry = new MetadataEntry();
-                metadataEntry.setKey(metadataKey);
-                metadataEntry.setValue(metadataValue + " " + (number - i));
-                newStructure.getMetadata().add(metadataEntry);
-            }
+            MetadataEntry metadataEntry = new MetadataEntry();
+            metadataEntry.setKey(metadataKey);
+            metadataEntry.setValue(metadataValue + " " + (number - i));
+            newStructure.getMetadata().add(metadataEntry);
         }
     }
 
