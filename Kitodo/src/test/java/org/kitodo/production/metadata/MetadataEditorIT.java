@@ -80,9 +80,7 @@ public class MetadataEditorIT {
 
     @Test
     public void shouldAddMultipleStructuresWithoutMetadata() throws Exception {
-
         File metaXmlFile = new File("src/test/resources/metadata/2/meta.xml");
-        List<String> metaXmlContentBefore = FileUtils.readLines(metaXmlFile, StandardCharsets.UTF_8);
         Workpiece workpiece = ServiceManager.getMetsService().loadWorkpiece(metaXmlFile.toURI());
         
         int oldNrLogicalDivisions = workpiece.getAllLogicalDivisions().size();
@@ -95,9 +93,6 @@ public class MetadataEditorIT {
         List<LogicalDivision> logicalDivisions = workpiece.getAllLogicalDivisions();
         assertTrue("Metadata should be empty",
             logicalDivisions.get(newNrDivisions - 1).getMetadata().isEmpty());
-
-        FileUtils.writeLines(metaXmlFile, StandardCharsets.UTF_8.toString(), metaXmlContentBefore);
-        FileUtils.deleteQuietly(new File("src/test/resources/metadata/2/meta.xml.1"));
     }
 
     private boolean isInternalMetsLink(String lineOfMets, int recordNumber) {
