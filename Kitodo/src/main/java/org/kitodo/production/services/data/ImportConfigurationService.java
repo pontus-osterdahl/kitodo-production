@@ -11,10 +11,13 @@
 
 package org.kitodo.production.services.data;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
+import org.kitodo.api.externaldatamanagement.ImportConfigurationType;
 import org.kitodo.data.database.beans.ImportConfiguration;
 import org.kitodo.data.database.beans.Project;
 import org.kitodo.data.database.exceptions.DAOException;
@@ -66,8 +69,9 @@ public class ImportConfigurationService extends SearchDatabaseService<ImportConf
      * @return loaded data
      */
     @Override
-    public List loadData(int first, int pageSize, String sortField, SortOrder sortOrder, Map filters) throws DataException {
-        return null;
+    @SuppressWarnings("unchecked")
+    public List<ImportConfiguration> loadData(int first, int pageSize, String sortField, SortOrder sortOrder, Map filters) {
+        return dao.getByQuery("FROM ImportConfiguration"  + getSort(sortField, sortOrder), filters, first, pageSize);
     }
 
     /**
@@ -110,5 +114,32 @@ public class ImportConfigurationService extends SearchDatabaseService<ImportConf
             }
         }
         dao.remove(id);
+    }
+
+
+    /**
+     * Load and return all ImportConfigurations of type OPAC_SEARCH.
+     * @return list of OPAC_SEARCH type ImportConfigurations
+     * @throws DAOException when ImportConfigurations could not be loaded
+     */
+    public List<ImportConfiguration> getAllOpacSearchConfigurations() throws DAOException {
+        return getAllImportConfigurations(ImportConfigurationType.OPAC_SEARCH);
+    }
+
+    /**
+     * Load and return all ImportConfigurations of type FILE_UPLOAD.
+     * @return list of FILE_UPLOAD type ImportConfigurations
+     * @throws DAOException when ImportConfigurations could not be loaded
+     */
+    public List<ImportConfiguration> getAllFileUploadConfigurations() throws DAOException {
+        return getAllImportConfigurations(ImportConfigurationType.FILE_UPLOAD);
+    }
+
+    private List<ImportConfiguration> getAllImportConfigurations(ImportConfigurationType type) throws DAOException {
+        return getAll().stream()
+                .filter(importConfiguration -> type.name()
+                        .equals(importConfiguration.getConfigurationType()))
+                .sorted(Comparator.comparing(ImportConfiguration::getTitle))
+                .collect(Collectors.toList());
     }
 }

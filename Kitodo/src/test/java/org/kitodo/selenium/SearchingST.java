@@ -31,6 +31,8 @@ import org.kitodo.selenium.testframework.pages.SearchResultPage;
 
 public class SearchingST extends BaseTestSelenium {
 
+    private static final String WAIT_FOR_FILTER_IS_APPLIED = "Wait until filter is applied";
+
     private static DesktopPage desktopPage;
     private static SearchResultPage searchResultPage;
     private static ExtendedSearchPage extendedSearchPage;
@@ -79,6 +81,20 @@ public class SearchingST extends BaseTestSelenium {
     }
 
     @Test
+    public void searchForProcessesAndSort() throws Exception {
+        desktopPage.searchInSearchField("process");
+        searchResultPage.clickTitleColumnForSorting();
+
+        assertEquals("First process should be top result when sorting by title", "First process", 
+            searchResultPage.getFirstSearchResultProcessTitle());
+
+        searchResultPage.clickTitleColumnForSorting();
+
+        assertEquals("Second process should be top result when reverse-sorting by title", "Second process", 
+            searchResultPage.getFirstSearchResultProcessTitle());
+    }
+
+    @Test
     public void testExtendedSearch() throws Exception {
         processesPage.goTo();
         processesPage.navigateToExtendedSearch();
@@ -94,5 +110,33 @@ public class SearchingST extends BaseTestSelenium {
                 () -> assertEquals("There should be one process found", 1, processesPage.countListedProcesses()));
         processTitles = processesPage.getProcessTitles();
         assertEquals("Wrong process found", "Second process", processTitles.get(0));
+    }
+
+    /**
+     * Checks that a case insensitive search for process titles works.
+     */
+    @Test
+    public void caseInsensitiveSearchForProcesses() throws Exception {
+        desktopPage.searchInSearchField("PrOCeSs");
+        assertEquals("Two processes should match case-insensitive search", 2, searchResultPage.getNumberOfResults());
+    }
+
+    /**
+     * Checks that a case insensitive filter for task status works.
+     */
+    @Test
+    public void caseInsensitiveFilterTaskStatus() throws Exception {
+        processesPage.goTo();
+        processesPage.applyFilter("\"stepinwork:pRoGrEsS\"");
+
+        await(WAIT_FOR_FILTER_IS_APPLIED)
+            .pollDelay(100, TimeUnit.MILLISECONDS)
+            .atMost(10, TimeUnit.SECONDS).ignoreExceptions()
+            .untilAsserted(() -> {
+                List<String> processTitles = processesPage.getProcessTitles();
+                assertEquals("Case insensitive filter should match only one process", 1, processTitles.size());
+                assertEquals("Case insensitive filter should match \"First process\"", "First process", 
+                    processTitles.get(0));
+            });
     }
 }
