@@ -727,10 +727,21 @@ public class AddDocStrucTypeDialog {
         }
     }
     
-    private StructuralElementViewInterface getDivisionViewOfStructure(String structure) {
-        StructuralElementViewInterface divisionView = dataEditor.getRulesetManagement()
-                .getStructuralElementView(structure, dataEditor.getAcquisitionStage(), dataEditor.getPriorityList());
-        return divisionView;
+    /**
+     * This method checks if the selected metadatakey refers to complex metadata.
+     * 
+     * @return True if metadata is of complex type.
+     */
+    public boolean isSelectedMetadataComplex() {
+        MetadataViewInterface mvi = getMetadataViewFromKey(docStructAddTypeSelectionSelectedItem,selectedMetadata);
+        return mvi.isComplex();
+    }
+    
+    private MetadataViewInterface getMetadataViewFromKey(String structure, String metadataKey) {
+        StructuralElementViewInterface divisionView = getDivisionViewOfNewStructure(structure);
+
+        return divisionView.getAllowedMetadata().stream().filter(metaDatum -> metaDatum.getId().equals(metadataKey))
+                .findFirst().orElseThrow(IllegalStateException::new);
     }
     
     private MetadataViewInterface getMetadataViewFromKey(String structure, String metadataKey) {
