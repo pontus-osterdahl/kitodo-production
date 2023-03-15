@@ -503,7 +503,7 @@ public class CreateProcessForm extends BaseForm implements MetadataTreeTableInte
      * Create process hierarchy.
      */
     private void createProcessHierarchy()
-            throws DataException, ProcessGenerationException, IOException {
+            throws DataException, DAOException, ProcessGenerationException, IOException {
         // discard all processes in hierarchy except the first if parent process in
         // title record link tab is selected!
         if (this.processes.size() > 1 && Objects.nonNull(this.titleRecordLinkTab.getTitleRecordProcess())
@@ -550,7 +550,20 @@ public class CreateProcessForm extends BaseForm implements MetadataTreeTableInte
                 MetadataEditor.addLink(this.processes.get(i + 1).getProcess(), "0", tempProcess.getProcess().getId());
             }
         }
-        ServiceManager.getProcessService().save(getMainProcess(), true);
+
+        Process process = getMainProcess();
+
+        processTitleViews = ProcessHelper.getProcessTitleMetadata(process, acquisitionStage, priorityList);
+        URI metadataFileUri = ServiceManager.getProcessService().getMetadataFileUri(process);
+        Workpiece workpiece = ServiceManager.getMetsService().loadWorkpiece(metadataFileUri);
+
+        for (SimpleMetadataViewInterface processTitleView : processTitleViews) {
+            MetadataEditor.writeMetadataEntry(workpiece.getLogicalStructure(), processTitleView, process.getTitle());
+        }
+
+        ServiceManager.getMetsService().saveWorkpiece(workpiece, metadataFileUri);
+        ServiceManager.getProcessService().checkTasks(process, workpiece.getLogicalStructure().getType());
+        ServiceManager.getProcessService().save(process, true);
     }
 
     /**
