@@ -25,6 +25,7 @@ import org.junit.Test;
 import org.kitodo.MockDatabase;
 import org.kitodo.SecurityTestUtils;
 import org.kitodo.api.dataeditor.rulesetmanagement.RulesetManagementInterface;
+import org.kitodo.api.dataeditor.rulesetmanagement.SimpleMetadataViewInterface;
 import org.kitodo.api.dataformat.Workpiece;
 import org.kitodo.data.database.beans.Process;
 import org.kitodo.data.database.beans.User;
@@ -90,6 +91,13 @@ public class ProcessHelperIT {
         testForceRegenerationByTempProcessParents(tempProcess, rulesetManagementInterface);
 
         testForceRegenerationByParentProcess(tempProcess, rulesetManagementInterface);
+    }
+    
+    @Test
+    public void shouldReturnProcessTitleMetadata() throws DAOException, IOException {
+        Process process = ServiceManager.getProcessService().getById(2);
+        List<SimpleMetadataViewInterface> titleMetadataViews = (List) ProcessHelper.getProcessTitleMetadata(process, "create", priorityList);
+        assertEquals(titleMetadataViews.get(0).getId(),"process_title");
     }
 
     private void testForceRegenerationByParentProcess(TempProcess tempProcess,
