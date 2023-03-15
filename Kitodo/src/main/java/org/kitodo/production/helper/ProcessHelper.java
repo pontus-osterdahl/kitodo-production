@@ -368,5 +368,35 @@ public class ProcessHelper {
         }
         return StringUtils.EMPTY;
     }
+    
+        /**
+     * Returns the metadata used to store process title.
+     * 
+     * @param process 
+     *            the process from which to extract the process title metadata.
+     * @param acquisitionStage
+     *            current aquisition level
+     * @param priorityList
+     *            weighted list of user-preferred display languages
+     * @return The metadataviewinterfaces of the metadata used to store the process' title
+     */
+    public static Collection<SimpleMetadataViewInterface> getProcessTitleMetadata(Process process, 
+            String acquisitionStage, List<Locale.LanguageRange> priorityList) throws DAOException, IOException {
+        Ruleset ruleset = process.getRuleset();
+        RulesetManagementInterface rulesetManagement = ServiceManager.getRulesetService()
+                   .openRuleset(ServiceManager.getRulesetService().getById(ruleset.getId()));
+        URI metadataFileUri = ServiceManager.getProcessService().getMetadataFileUri(process);
+        Workpiece workpiece = ServiceManager.getMetsService().loadWorkpiece(metadataFileUri);
+        String docType = workpiece.getLogicalStructure().getType();
+
+        StructuralElementViewInterface divisionView = rulesetManagement
+                   .getStructuralElementView(docType, acquisitionStage, priorityList);
+        final Collection<String> processTitleKeys = rulesetManagement
+                   .getFunctionalKeys(FunctionalMetadata.PROCESS_TITLE);
+        return divisionView.getAllowedMetadata().parallelStream()
+                   .filter(SimpleMetadataViewInterface.class::isInstance).map(SimpleMetadataViewInterface.class::cast)
+                   .filter(metadataView -> processTitleKeys.contains(metadataView.getId()))
+                   .collect(Collectors.toList());
+    }
 
 }
