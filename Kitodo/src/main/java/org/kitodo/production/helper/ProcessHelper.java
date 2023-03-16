@@ -412,20 +412,21 @@ public class ProcessHelper {
     public static Workpiece getWorkpieceWithTitleMetadata(Process process, 
             String acquisitionStage, List<Locale.LanguageRange> priorityList) throws DAOException, IOException {
         Collection<SimpleMetadataViewInterface> processTitleViews = getProcessTitleMetadata(process, acquisitionStage, priorityList);
-        
+
         return getWorkpieceWithTitleMetadata(process,processTitleViews);
     }
-    
+
     /**
      * Generates a workpiece of the process and saved the process title to its metadata.
      * 
      * @param process 
      *            the process from which to extract the process title metadata
-     * @param processTitleView
+     * @param processTitleViews
      *            The views of the metadata to which the process titlesould be written
      * @return The workpiece of the process with the process title stored in metadata
      */
-    public static Workpiece getWorkpieceWithTitleMetadata(Process process, Collection<SimpleMetadataViewInterface> processTitleViews) throws IOException {
+    public static Workpiece getWorkpieceWithTitleMetadata(Process process, Collection<SimpleMetadataViewInterface> processTitleViews) 
+            throws IOException {
         URI metadataFileUri = ServiceManager.getProcessService().getMetadataFileUri(process);
         Workpiece workpiece = ServiceManager.getMetsService().loadWorkpiece(metadataFileUri);
 
@@ -433,7 +434,6 @@ public class ProcessHelper {
             MetadataEditor.writeMetadataEntry(workpiece.getLogicalStructure(), processTitleView,
                 process.getTitle());
         }
-        
         return workpiece;
     }
 
