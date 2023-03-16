@@ -519,7 +519,6 @@ public class CreateProcessForm extends BaseForm implements MetadataTreeTableInte
         if (!createProcessesLocation(this.processes)) {
             throw new IOException("Unable to create directories for process hierarchy!");
         }
-
         if (this.catalogImportDialog.isImportChildren() && !createProcessesLocation(this.childProcesses)) {
             throw new IOException("Unable to create directories for child processes!");
         }
@@ -529,10 +528,8 @@ public class CreateProcessForm extends BaseForm implements MetadataTreeTableInte
             // saving the main process automatically saves its parent and ancestor processes as well!
             ServiceManager.getProcessService().save(getMainProcess(), true);
         }
-
         // add links between child processes and main process
         this.saveChildProcessLinks();
-
         // if a process is selected in 'TitleRecordLinkTab' link it as parent with the first process in the list
         if (this.processes.size() > 0 && Objects.nonNull(titleRecordLinkTab.getTitleRecordProcess())) {
             MetadataEditor.addLink(titleRecordLinkTab.getTitleRecordProcess(),
@@ -551,7 +548,6 @@ public class CreateProcessForm extends BaseForm implements MetadataTreeTableInte
             }
         }
         Workpiece workpiece = ProcessHelper.getWorkPieceWithTitleMetadata(getMainProcess(), acquisitionStage, priorityList);
-
         ServiceManager.getMetsService().saveWorkpiece(workpiece, metadataFileUri);
         ServiceManager.getProcessService().checkTasks(getMainProcess(), workpiece.getLogicalStructure().getType());
         ServiceManager.getProcessService().save(getMinProcess(), true);
