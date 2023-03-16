@@ -56,6 +56,7 @@ import org.kitodo.production.dto.ProcessDTO;
 import org.kitodo.production.enums.ObjectType;
 import org.kitodo.production.forms.BaseForm;
 import org.kitodo.production.helper;
+import org.kitodo.production.helper.Helper;
 import org.kitodo.production.helper.ProcessHelper;
 import org.kitodo.production.helper.TempProcess;
 import org.kitodo.production.interfaces.MetadataTreeTableInterface;
