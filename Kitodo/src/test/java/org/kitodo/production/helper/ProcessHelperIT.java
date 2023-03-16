@@ -12,20 +12,26 @@
 package org.kitodo.production.helper;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.HashSet;
 
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.kitodo.MockDatabase;
 import org.kitodo.SecurityTestUtils;
+import org.kitodo.api.Metadata;
+import org.kitodo.api.MetadataEntry;
 import org.kitodo.api.dataeditor.rulesetmanagement.RulesetManagementInterface;
 import org.kitodo.api.dataeditor.rulesetmanagement.SimpleMetadataViewInterface;
+import org.kitodo.api.dataformat.LogicalDivision;
 import org.kitodo.api.dataformat.Workpiece;
 import org.kitodo.data.database.beans.Process;
 import org.kitodo.data.database.beans.User;
@@ -98,6 +104,31 @@ public class ProcessHelperIT {
         Process process = ServiceManager.getProcessService().getById(2);
         List<SimpleMetadataViewInterface> titleMetadataViews = (List) ProcessHelper.getProcessTitleMetadata(process, "create", priorityList);
         assertEquals(titleMetadataViews.get(0).getId(),"process_title");
+        assertFalse(titleMetadataViews.get(0).getId().equals("incorrect_key"));
+    }
+    
+    @Test
+    public void shouldReturnWorkpieceWithProcessTitleMetadataFromKeys() throws DAOException, IOException {
+        Process process = ServiceManager.getProcessService().getById(2);
+        Collection<SimpleMetadataViewInterface> titleMetadataViews = ProcessHelper.getProcessTitleMetadata(process, "create", priorityList);
+        
+        Workpiece workpiece = ProcessHelper.getWorkpieceWithTitleMetadata(process, titleMetadataViews);
+        LogicalDivision division = workpiece.getLogicalStructure();
+        Collection<Metadata> metadata = division.getMetadata();
+        MetadataEntry processTitle = (MetadataEntry)metadata.stream().filter(metaDatum -> metaDatum.getKey().equals("process_title"))
+        .findFirst().orElseThrow(IllegalStateException::new);
+        assertEquals(processTitle.getValue(),process.getTitle());
+    }
+    
+    @Test
+    public void shouldReturnWorkpieceWithProcessTitleMetadataFromProcess() throws DAOException, IOException {
+        Process process = ServiceManager.getProcessService().getById(2);
+        Workpiece workpiece = ProcessHelper.getWorkpieceWithTitleMetadata(process, "create", priorityList);
+        LogicalDivision division = workpiece.getLogicalStructure();
+        Collection<Metadata> metadata = division.getMetadata();
+        MetadataEntry processTitle = (MetadataEntry)metadata.stream().filter(metaDatum -> metaDatum.getKey().equals("process_title"))
+        .findFirst().orElseThrow(IllegalStateException::new);
+        assertEquals(processTitle.getValue(),process.getTitle());
     }
 
     private void testForceRegenerationByParentProcess(TempProcess tempProcess,
