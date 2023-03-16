@@ -370,7 +370,7 @@ public class ProcessHelper {
     }
     
     /**
-     * Returns the metadata used to store process title.
+     * Returns the metadatafield(s) used to store process title.
      * 
      * @param process 
      *            the process from which to extract the process title metadata.
@@ -387,8 +387,7 @@ public class ProcessHelper {
                    .openRuleset(ServiceManager.getRulesetService().getById(ruleset.getId()));
         URI metadataFileUri = ServiceManager.getProcessService().getMetadataFileUri(process);
         Workpiece workpiece = ServiceManager.getMetsService().loadWorkpiece(metadataFileUri);
-        String docType = workpiece.getLogicalStructure().getType();
-
+        String docType = workpiece.getLogicalStructure().getType(); 
         StructuralElementViewInterface divisionView = rulesetManagement
                    .getStructuralElementView(docType, acquisitionStage, priorityList);
         final Collection<String> processTitleKeys = rulesetManagement
@@ -397,6 +396,45 @@ public class ProcessHelper {
                    .filter(SimpleMetadataViewInterface.class::isInstance).map(SimpleMetadataViewInterface.class::cast)
                    .filter(metadataView -> processTitleKeys.contains(metadataView.getId()))
                    .collect(Collectors.toList());
+    }
+    
+    /**
+     * Generates a workpiece of the process with the process title saved in metadata.
+     * 
+     * @param process 
+     *            the process from which to create the workpiece with process title metadata.
+     * @param acquisitionStage
+     *            current aquisition level
+     * @param priorityList
+     *            weighted list of user-preferred display languages
+     * @return The workpiece of the process with the process title stored in metadata
+     */
+    public static Workpiece getWorkpieceWithTitleMetadata(Process process, 
+            String acquisitionStage, List<Locale.LanguageRange> priorityList) throws DAOException, IOException {
+        Collection<SimpleMetadataViewInterface> processTitleViews = getProcessTitleMetadata(process, acquisitionStage, priorityList);
+        
+        return getWorkpieceWithTitleMetadata(process,processTitleViews);
+    }
+    
+    /**
+     * Generates a workpiece of the process and saved the process title to its metadata.
+     * 
+     * @param process 
+     *            the process from which to extract the process title metadata
+     * @param processTitleView
+     *            The views of the metadata to which the process titlesould be written
+     * @return The workpiece of the process with the process title stored in metadata
+     */
+    public static Workpiece getWorkpieceWithTitleMetadata(Process process, Collection<SimpleMetadataViewInterface> processTitleViews) throws IOException {
+        URI metadataFileUri = ServiceManager.getProcessService().getMetadataFileUri(process);
+        Workpiece workpiece = ServiceManager.getMetsService().loadWorkpiece(metadataFileUri);
+
+        for (SimpleMetadataViewInterface processTitleView : processTitleViews) {
+            MetadataEditor.writeMetadataEntry(workpiece.getLogicalStructure(), processTitleView,
+                process.getTitle());
+        }
+        
+        return workpiece;
     }
 
 }
