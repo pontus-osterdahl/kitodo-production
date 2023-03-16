@@ -56,6 +56,7 @@ import org.kitodo.production.dto.ProcessDTO;
 import org.kitodo.production.enums.ObjectType;
 import org.kitodo.production.forms.BaseForm;
 import org.kitodo.production.helper.Helper;
+import org.kitodo.production.helper;
 import org.kitodo.production.helper.TempProcess;
 import org.kitodo.production.interfaces.MetadataTreeTableInterface;
 import org.kitodo.production.interfaces.RulesetSetupInterface;
@@ -548,9 +549,9 @@ public class CreateProcessForm extends BaseForm implements MetadataTreeTableInte
             }
         }
         Workpiece workpiece = ProcessHelper.getWorkPieceWithTitleMetadata(getMainProcess(), acquisitionStage, priorityList);
-        ServiceManager.getMetsService().saveWorkpiece(workpiece, ServiceManager.getProcessService().getMetadataFileUri(process));
+        ServiceManager.getMetsService().saveWorkpiece(workpiece, ServiceManager.getProcessService().getMetadataFileUri(getMainProcess()));
         ServiceManager.getProcessService().checkTasks(getMainProcess(), workpiece.getLogicalStructure().getType());
-        ServiceManager.getProcessService().save(getMinProcess(), true);
+        ServiceManager.getProcessService().save(getMainProcess(), true);
     }
 
     /**
