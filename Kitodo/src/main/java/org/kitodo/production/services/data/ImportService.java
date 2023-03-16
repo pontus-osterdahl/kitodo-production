@@ -1202,8 +1202,7 @@ public class ImportService {
                     Locale.LanguageRange.parse(metadataLanguage.isEmpty() ? "en" : metadataLanguage));
             ServiceManager.getMetsService().saveWorkpiece(workpiece, ServiceManager.getProcessService()
                     .getMetadataFileUri(tempProcess.getProcess()));
-            ServiceManager.getProcessService().checkTasks(tempProcess.getProcess(), workpiece.getLogicalStructure().getType());
-            ServiceManager.getProcessService().save(tempProcess.getProcess(), true);
+            ServiceManager.getProcessService().save(tempProcess.getProcess());
         } catch (DAOException | IOException | ProcessGenerationException | XPathExpressionException | ParserConfigurationException
                 | NoRecordFoundException | UnsupportedFormatException | URISyntaxException | SAXException | InvalidMetadataValueException
                 | NoSuchMetadataFieldException | DataException | CommandException | TransformerException | CatalogException e) {
