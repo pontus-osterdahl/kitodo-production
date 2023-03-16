@@ -1169,8 +1169,7 @@ public class ImportService {
         try {
             template = ServiceManager.getTemplateService().getById(templateId);
             String parentMetadataKey = "";
-            List<String> higherLevelIdentifiers = new ArrayList<>(
-                    getHigherLevelIdentifierMetadata(template.getRuleset()));
+            List<String> higherLevelIdentifiers = new ArrayList<>( getHigherLevelIdentifierMetadata(template.getRuleset()));
             if (!higherLevelIdentifiers.isEmpty()) {
                 parentMetadataKey = higherLevelIdentifiers.get(0);
             }
@@ -1180,9 +1179,8 @@ public class ImportService {
             tempProcess = processList.get(0);
             String metadataLanguage = ServiceManager.getUserService().getCurrentUser().getMetadataLanguage();
             tempProcess.getWorkpiece().getLogicalStructure().getMetadata().addAll(createMetadata(presetMetadata));
-            processTempProcess(tempProcess, ServiceManager.getRulesetService().openRuleset(template.getRuleset()),
-                    "create", Locale.LanguageRange.parse(metadataLanguage.isEmpty() ? "en" : metadataLanguage),
-                    parentTempProcess);
+            processTempProcess(tempProcess, ServiceManager.getRulesetService().openRuleset(template.getRuleset()), "create", 
+                    Locale.LanguageRange.parse(metadataLanguage.isEmpty() ? "en" : metadataLanguage), parentTempProcess);
             String title = tempProcess.getProcess().getTitle();
             String validateRegEx = ConfigCore.getParameterOrDefaultValue(ParameterCore.VALIDATE_PROCESS_TITLE_REGEX);
             if (StringUtils.isBlank(title)) {
@@ -1205,10 +1203,9 @@ public class ImportService {
             ServiceManager.getMetsService().saveWorkpiece(workpiece, ServiceManager.getProcessService().getMetadataFileUri(process));
             ServiceManager.getProcessService().checkTasks(tempProcess.getProcess(), workpiece.getLogicalStructure().getType());
             ServiceManager.getProcessService().save(tempProcess.getProcess(), true);
-        } catch (DAOException | IOException | ProcessGenerationException | XPathExpressionException
-                | ParserConfigurationException | NoRecordFoundException | UnsupportedFormatException
-                | URISyntaxException | SAXException | InvalidMetadataValueException | NoSuchMetadataFieldException
-                | DataException | CommandException | TransformerException | CatalogException e) {
+        } catch (DAOException | IOException | ProcessGenerationException | XPathExpressionException | ParserConfigurationException
+                | NoRecordFoundException | UnsupportedFormatException | URISyntaxException | SAXException | InvalidMetadataValueException
+                | NoSuchMetadataFieldException | DataException | CommandException | TransformerException | CatalogException e) {
             logger.error(e);
             throw new ImportException(e.getLocalizedMessage());
         }
