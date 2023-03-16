@@ -369,7 +369,7 @@ public class ProcessHelper {
         return StringUtils.EMPTY;
     }
     
-        /**
+    /**
      * Returns the metadata used to store process title.
      * 
      * @param process 
