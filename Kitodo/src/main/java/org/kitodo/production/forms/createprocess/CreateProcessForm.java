@@ -550,20 +550,11 @@ public class CreateProcessForm extends BaseForm implements MetadataTreeTableInte
                 MetadataEditor.addLink(this.processes.get(i + 1).getProcess(), "0", tempProcess.getProcess().getId());
             }
         }
-
-        Process process = getMainProcess();
-
-        processTitleViews = ProcessHelper.getProcessTitleMetadata(process, acquisitionStage, priorityList);
-        URI metadataFileUri = ServiceManager.getProcessService().getMetadataFileUri(process);
-        Workpiece workpiece = ServiceManager.getMetsService().loadWorkpiece(metadataFileUri);
-
-        for (SimpleMetadataViewInterface processTitleView : processTitleViews) {
-            MetadataEditor.writeMetadataEntry(workpiece.getLogicalStructure(), processTitleView, process.getTitle());
-        }
+        Workpiece workpiece = ProcessHelper.getWorkPieceWithTitleMetadata(getMainProcess(), acquisitionStage, priorityList);
 
         ServiceManager.getMetsService().saveWorkpiece(workpiece, metadataFileUri);
-        ServiceManager.getProcessService().checkTasks(process, workpiece.getLogicalStructure().getType());
-        ServiceManager.getProcessService().save(process, true);
+        ServiceManager.getProcessService().checkTasks(getMainProcess(), workpiece.getLogicalStructure().getType());
+        ServiceManager.getProcessService().save(getMinProcess(), true);
     }
 
     /**
