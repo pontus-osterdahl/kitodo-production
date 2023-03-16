@@ -1198,9 +1198,9 @@ public class ImportService {
             tempProcess.getWorkpiece().setId(tempProcess.getProcess().getId().toString());
             ServiceManager.getMetsService().save(tempProcess.getWorkpiece(), out);
             linkToParent(tempProcess);
-            Workpiece workpiece = ProcessHelper.getWorkpieceWithTitleMetadata(process,ACQUISITION_STAGE_CREATE,
+            Workpiece workpiece = ProcessHelper.getWorkpieceWithTitleMetadata(tempProcess.getProcess(),ACQUISITION_STAGE_CREATE,
                 Locale.LanguageRange.parse(metadataLanguage.isEmpty() ? "en" : metadataLanguage));
-            ServiceManager.getMetsService().saveWorkpiece(workpiece, ServiceManager.getProcessService().getMetadataFileUri(process));
+            ServiceManager.getMetsService().saveWorkpiece(workpiece, ServiceManager.getProcessService().getMetadataFileUri(tempProcess.getProcess()));
             ServiceManager.getProcessService().checkTasks(tempProcess.getProcess(), workpiece.getLogicalStructure().getType());
             ServiceManager.getProcessService().save(tempProcess.getProcess(), true);
         } catch (DAOException | IOException | ProcessGenerationException | XPathExpressionException | ParserConfigurationException
