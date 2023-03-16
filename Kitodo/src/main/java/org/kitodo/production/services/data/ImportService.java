@@ -1200,23 +1200,8 @@ public class ImportService {
             tempProcess.getWorkpiece().setId(tempProcess.getProcess().getId().toString());
             ServiceManager.getMetsService().save(tempProcess.getWorkpiece(), out);
             linkToParent(tempProcess);
-            ServiceManager.getProcessService().save(tempProcess.getProcess());
-
             Process process = tempProcess.getProcess();
-
-            Collection<SimpleMetadataViewInterface> processTitleViews = ProcessHelper.getProcessTitleMetadata(process,
-                    ACQUISITION_STAGE_CREATE, Locale.LanguageRange.parse(metadataLanguage.isEmpty() ? "en" : metadataLanguage));
-            URI metadataFileUri = ServiceManager.getProcessService().getMetadataFileUri(process);
-            Workpiece workpiece = ServiceManager.getMetsService().loadWorkpiece(metadataFileUri);
-
-            for (SimpleMetadataViewInterface processTitleView : processTitleViews) {
-                MetadataEditor.writeMetadataEntry(workpiece.getLogicalStructure(), processTitleView,
-                    process.getTitle());
-            }
-
-            ServiceManager.getMetsService().saveWorkpiece(workpiece, metadataFileUri);
-            ServiceManager.getProcessService().checkTasks(process, workpiece.getLogicalStructure().getType());
-            ServiceManager.getProcessService().save(process, true);
+            saveWithTitle(process,metadataLanguage);
         } catch (DAOException | IOException | ProcessGenerationException | XPathExpressionException
                 | ParserConfigurationException | NoRecordFoundException | UnsupportedFormatException
                 | URISyntaxException | SAXException | InvalidMetadataValueException | NoSuchMetadataFieldException
@@ -1225,6 +1210,20 @@ public class ImportService {
             throw new ImportException(e.getLocalizedMessage());
         }
         return tempProcess.getProcess();
+    }
+    
+    private void saveWithTitle(Process process, String metadataLanguage) {
+        
+        Collection<SimpleMetadataViewInterface> processTitleViews = ProcessHelper.getProcessTitleMetadata(process,
+                    ACQUISITION_STAGE_CREATE, Locale.LanguageRange.parse(metadataLanguage.isEmpty() ? "en" : metadataLanguage));
+            URI metadataFileUri = ServiceManager.getProcessService().getMetadataFileUri(process);
+            Workpiece workpiece = ServiceManager.getMetsService().loadWorkpiece(metadataFileUri);
+            for (SimpleMetadataViewInterface processTitleView : processTitleViews) {
+                MetadataEditor.writeMetadataEntry(workpiece.getLogicalStructure(), processTitleView, process.getTitle());
+            }
+            ServiceManager.getMetsService().saveWorkpiece(workpiece, metadataFileUri);
+            ServiceManager.getProcessService().checkTasks(process, workpiece.getLogicalStructure().getType());
+            ServiceManager.getProcessService().save(process, true);
     }
 
     private void linkToParent(TempProcess tempProcess) throws DAOException, ProcessGenerationException, IOException {
