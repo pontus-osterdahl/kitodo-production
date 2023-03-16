@@ -43,6 +43,9 @@
         <key id="document_type" use="docType">
             <label>Document type</label>
         </key>
+        <key id="process_title" use="processTitle">
+                 <label>Process title</label>
+        </key>
         <key id="CatalogIDDigital" use="recordIdentifier">
             <label>PPN (digital)</label>
         </key>
@@ -141,6 +144,7 @@
                     <permit value="Author"/>
                 </permit>
             </permit>
+            <permit key="process_title"/>
         </restriction>
         <restriction division="ContainedWork" unspecified="forbidden">
                 <permit key="TitleDocMain" minOccurs="1"/>
