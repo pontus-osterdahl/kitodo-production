@@ -550,8 +550,7 @@ public class CreateProcessForm extends BaseForm implements MetadataTreeTableInte
         }
         Workpiece workpiece = ProcessHelper.getWorkpieceWithTitleMetadata(getMainProcess(), acquisitionStage, priorityList);
         ServiceManager.getMetsService().saveWorkpiece(workpiece, ServiceManager.getProcessService().getMetadataFileUri(getMainProcess()));
-        ServiceManager.getProcessService().checkTasks(getMainProcess(), workpiece.getLogicalStructure().getType());
-        ServiceManager.getProcessService().save(getMainProcess(), true);
+        ServiceManager.getProcessService().save(getMainProcess());
     }
 
     /**
