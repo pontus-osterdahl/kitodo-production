@@ -337,7 +337,7 @@ public class CreateProcessForm extends BaseForm implements MetadataTreeTableInte
                 rulesetFile = getMainProcess().getRuleset().getFile();
             }
             Helper.setErrorMessage("rulesetNotFound", new Object[] {rulesetFile }, logger, e);
-        } catch (IOException | ProcessGenerationException e) {
+        } catch (IOException | ProcessGenerationException | DAOException e) {
             logger.error(e.getLocalizedMessage(), e);
         }
         return this.stayOnCurrentPage;
