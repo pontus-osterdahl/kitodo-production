@@ -12,12 +12,15 @@
 package org.kitodo.production.helper;
 
 import java.io.IOException;
+import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -26,16 +29,22 @@ import org.kitodo.api.MdSec;
 import org.kitodo.api.Metadata;
 import org.kitodo.api.MetadataEntry;
 import org.kitodo.api.MetadataGroup;
+import org.kitodo.api.dataeditor.rulesetmanagement.FunctionalMetadata;
 import org.kitodo.api.dataeditor.rulesetmanagement.RulesetManagementInterface;
+import org.kitodo.api.dataeditor.rulesetmanagement.SimpleMetadataViewInterface;
 import org.kitodo.api.dataeditor.rulesetmanagement.StructuralElementViewInterface;
 import org.kitodo.api.dataformat.LogicalDivision;
+import org.kitodo.api.dataformat.Workpiece;
 import org.kitodo.data.database.beans.Process;
+import org.kitodo.data.database.beans.Ruleset;
+import org.kitodo.data.database.exceptions.DAOException;
 import org.kitodo.exceptions.InvalidMetadataValueException;
 import org.kitodo.exceptions.NoSuchMetadataFieldException;
 import org.kitodo.exceptions.ProcessGenerationException;
 import org.kitodo.production.forms.createprocess.ProcessDetail;
 import org.kitodo.production.forms.createprocess.ProcessFieldedMetadata;
 import org.kitodo.production.helper.metadata.legacytypeimplementations.LegacyMetsModsDigitalDocumentHelper;
+import org.kitodo.production.metadata.MetadataEditor;
 import org.kitodo.production.process.TiffHeaderGenerator;
 import org.kitodo.production.process.TitleGenerator;
 import org.kitodo.production.services.ServiceManager;
@@ -367,6 +376,74 @@ public class ProcessHelper {
             return ((MetadataEntry) metadataOptional.get()).getValue();
         }
         return StringUtils.EMPTY;
+    }
+    
+    /**
+     * Returns the metadatafield(s) used to store process title.
+     * 
+     * @param process 
+     *            the process from which to extract the process title metadata.
+     * @param acquisitionStage
+     *            current aquisition level
+     * @param priorityList
+     *            weighted list of user-preferred display languages
+     * @return The metadataviewinterfaces of the metadata used to store the process' title
+     */
+    public static Collection<SimpleMetadataViewInterface> getProcessTitleMetadata(Process process, 
+            String acquisitionStage, List<Locale.LanguageRange> priorityList) throws DAOException, IOException {
+        Ruleset ruleset = process.getRuleset();
+        RulesetManagementInterface rulesetManagement = ServiceManager.getRulesetService()
+                   .openRuleset(ServiceManager.getRulesetService().getById(ruleset.getId()));
+        URI metadataFileUri = ServiceManager.getProcessService().getMetadataFileUri(process);
+        Workpiece workpiece = ServiceManager.getMetsService().loadWorkpiece(metadataFileUri);
+        String docType = workpiece.getLogicalStructure().getType(); 
+        StructuralElementViewInterface divisionView = rulesetManagement
+                   .getStructuralElementView(docType, acquisitionStage, priorityList);
+        final Collection<String> processTitleKeys = rulesetManagement
+                   .getFunctionalKeys(FunctionalMetadata.PROCESS_TITLE);
+        return divisionView.getAllowedMetadata().parallelStream()
+                   .filter(SimpleMetadataViewInterface.class::isInstance).map(SimpleMetadataViewInterface.class::cast)
+                   .filter(metadataView -> processTitleKeys.contains(metadataView.getId()))
+                   .collect(Collectors.toList());
+    }
+    
+    /**
+     * Generates a workpiece of the process with the process title saved in metadata.
+     * 
+     * @param process 
+     *            the process from which to create the workpiece with process title metadata.
+     * @param acquisitionStage
+     *            current aquisition level
+     * @param priorityList
+     *            weighted list of user-preferred display languages
+     * @return The workpiece of the process with the process title stored in metadata
+     */
+    public static Workpiece getWorkpieceWithTitleMetadata(Process process, 
+            String acquisitionStage, List<Locale.LanguageRange> priorityList) throws DAOException, IOException {
+        Collection<SimpleMetadataViewInterface> processTitleViews = getProcessTitleMetadata(process, acquisitionStage, priorityList);
+
+        return getWorkpieceWithTitleMetadata(process,processTitleViews);
+    }
+
+    /**
+     * Generates a workpiece of the process and saved the process title to its metadata.
+     * 
+     * @param process 
+     *            the process from which to extract the process title metadata
+     * @param processTitleViews
+     *            The views of the metadata to which the process titlesould be written
+     * @return The workpiece of the process with the process title stored in metadata
+     */
+    public static Workpiece getWorkpieceWithTitleMetadata(Process process, Collection<SimpleMetadataViewInterface> processTitleViews) 
+            throws IOException {
+        URI metadataFileUri = ServiceManager.getProcessService().getMetadataFileUri(process);
+        Workpiece workpiece = ServiceManager.getMetsService().loadWorkpiece(metadataFileUri);
+
+        for (SimpleMetadataViewInterface processTitleView : processTitleViews) {
+            MetadataEditor.writeMetadataEntry(workpiece.getLogicalStructure(), processTitleView,
+                process.getTitle());
+        }
+        return workpiece;
     }
 
 }
