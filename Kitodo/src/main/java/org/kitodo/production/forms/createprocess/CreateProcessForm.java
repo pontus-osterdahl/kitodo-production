@@ -56,6 +56,7 @@ import org.kitodo.production.dto.ProcessDTO;
 import org.kitodo.production.enums.ObjectType;
 import org.kitodo.production.forms.BaseForm;
 import org.kitodo.production.helper.Helper;
+import org.kitodo.production.helper.ProcessHelper;
 import org.kitodo.production.helper.TempProcess;
 import org.kitodo.production.interfaces.MetadataTreeTableInterface;
 import org.kitodo.production.interfaces.RulesetSetupInterface;
@@ -336,7 +337,7 @@ public class CreateProcessForm extends BaseForm implements MetadataTreeTableInte
                 rulesetFile = getMainProcess().getRuleset().getFile();
             }
             Helper.setErrorMessage("rulesetNotFound", new Object[] {rulesetFile }, logger, e);
-        } catch (IOException | ProcessGenerationException e) {
+        } catch (IOException | ProcessGenerationException | DAOException e) {
             logger.error(e.getLocalizedMessage(), e);
         }
         return this.stayOnCurrentPage;
@@ -503,7 +504,7 @@ public class CreateProcessForm extends BaseForm implements MetadataTreeTableInte
      * Create process hierarchy.
      */
     private void createProcessHierarchy()
-            throws DataException, ProcessGenerationException, IOException {
+            throws DataException, DAOException, ProcessGenerationException, IOException {
         // discard all processes in hierarchy except the first if parent process in
         // title record link tab is selected!
         if (this.processes.size() > 1 && Objects.nonNull(this.titleRecordLinkTab.getTitleRecordProcess())
@@ -519,7 +520,6 @@ public class CreateProcessForm extends BaseForm implements MetadataTreeTableInte
         if (!createProcessesLocation(this.processes)) {
             throw new IOException("Unable to create directories for process hierarchy!");
         }
-
         if (this.catalogImportDialog.isImportChildren() && !createProcessesLocation(this.childProcesses)) {
             throw new IOException("Unable to create directories for child processes!");
         }
@@ -529,10 +529,8 @@ public class CreateProcessForm extends BaseForm implements MetadataTreeTableInte
             // saving the main process automatically saves its parent and ancestor processes as well!
             ServiceManager.getProcessService().save(getMainProcess(), true);
         }
-
         // add links between child processes and main process
         this.saveChildProcessLinks();
-
         // if a process is selected in 'TitleRecordLinkTab' link it as parent with the first process in the list
         if (this.processes.size() > 0 && Objects.nonNull(titleRecordLinkTab.getTitleRecordProcess())) {
             MetadataEditor.addLink(titleRecordLinkTab.getTitleRecordProcess(),
@@ -550,7 +548,9 @@ public class CreateProcessForm extends BaseForm implements MetadataTreeTableInte
                 MetadataEditor.addLink(this.processes.get(i + 1).getProcess(), "0", tempProcess.getProcess().getId());
             }
         }
-        ServiceManager.getProcessService().save(getMainProcess(), true);
+        Workpiece workpiece = ProcessHelper.getWorkpieceWithTitleMetadata(getMainProcess(), acquisitionStage, priorityList);
+        ServiceManager.getMetsService().saveWorkpiece(workpiece, ServiceManager.getProcessService().getMetadataFileUri(getMainProcess()));
+        ServiceManager.getProcessService().save(getMainProcess());
     }
 
     /**
