@@ -104,7 +104,6 @@ public class ProcessHelperIT {
         Process process = ServiceManager.getProcessService().getById(2);
         List<SimpleMetadataViewInterface> titleMetadataViews = (List) ProcessHelper.getProcessTitleMetadata(process, "create", priorityList);
         assertEquals(titleMetadataViews.get(0).getId(),"process_title");
-        assertFalse(titleMetadataViews.get(0).getId().equals("incorrect_key"));
     }
     
     @Test
