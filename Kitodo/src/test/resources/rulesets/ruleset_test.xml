@@ -44,7 +44,7 @@
             <label>Document type</label>
         </key>
         <key id="process_title" use="processTitle">
-                 <label>Process title</label>
+             <label>Process title</label>
         </key>
         <key id="CatalogIDDigital" use="recordIdentifier">
             <label>PPN (digital)</label>
