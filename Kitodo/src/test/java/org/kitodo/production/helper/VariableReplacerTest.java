@@ -167,9 +167,15 @@ public class VariableReplacerTest {
         ruleset.setFile("ruleset_test.xml");
         process.setRuleset(ruleset);
         process.setProcessBaseUri(URI.create("2"));
+        Folder scansFolder = new Folder();
+        scansFolder.setFileGroup("SOURCE");
+        scansFolder.setPath("images/(processtitle)scans");
         Project project = new Project();
         project.setId(projectId);
         process.setProject(project);
+        scansFolder.setProject(project);
+        project.getFolders().add(scansFolder);
+        project.setGeneratorSource(scansFolder);
 
         return process;
     }
