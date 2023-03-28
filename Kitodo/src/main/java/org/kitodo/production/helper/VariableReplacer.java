@@ -330,7 +330,7 @@ public class VariableReplacer {
             logger.warn("Cannot replace \"(" + match + ")\":: process has no generator source assigned");
             return variableFinder.group(1);
         }
-        
+
         //Since image paths may contain variables themselves, use recursion
         String generatorSource = replace(String.valueOf(process.getProject().getGeneratorSource().getPath()));
         String replacedString = variableFinder.group(1);
