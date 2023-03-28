@@ -137,6 +137,26 @@ public class VariableReplacerTest {
                 variableReplacer.containsFiles(toBeMatched));
     }
 
+    @Test
+    public void shouldReplaceGeneratorSource() {
+        VariableReplacer variableReplacer = new VariableReplacer(null, prepareProcess(), null);
+
+        String replaced = variableReplacer.replace("-filename (generatorsource) -hardcoded test");
+        String expected = "-filename " + "images/Replacementscans" + " -hardcoded test";
+        assertEquals("String should not match as containing file variables!", expected,
+                replaced);
+    }
+
+    @Test
+    public void shouldReplaceGeneratorSourcePath() {
+        VariableReplacer variableReplacer = new VariableReplacer(null, prepareProcess(), null);
+
+        String replaced = variableReplacer.replace("-filename (generatorsourcepath) -hardcoded test");
+        String expected = "-filename " + KitodoConfig.getKitodoDataDirectory() + "2/" + "images/Replacementscans" + " -hardcoded test";
+        assertEquals("String should not match as containing file variables!", expected,
+                replaced);
+    }
+
     private Process prepareProcess() {
         Process process = new Process();
         process.setId(2);
