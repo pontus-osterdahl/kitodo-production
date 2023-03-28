@@ -19,6 +19,7 @@ import java.net.URI;
 
 import org.junit.Test;
 import org.kitodo.config.KitodoConfig;
+import org.kitodo.data.database.beans.Folder;
 import org.kitodo.data.database.beans.Process;
 import org.kitodo.data.database.beans.Project;
 import org.kitodo.data.database.beans.Ruleset;
