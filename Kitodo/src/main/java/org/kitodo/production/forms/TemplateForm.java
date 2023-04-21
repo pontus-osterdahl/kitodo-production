@@ -125,7 +125,7 @@ public class TemplateForm extends TemplateBaseForm {
      * @return url to list view
      */
     public String save() {
-        if (isTitleValid()) {
+        if (isDataValid()) {
             try {
                 prepareTasks();
             } catch (DAOException | DataException | IOException e) {
@@ -154,6 +154,26 @@ public class TemplateForm extends TemplateBaseForm {
             return this.stayOnCurrentPage;
         }
         return templateListPath;
+    }
+
+    private boolean isDataValid() {
+        return isTitleValid() && isRulesetValid() && isDocketValid(); 
+    }
+
+    private boolean isRulesetValid() {
+        if (Objects.nonNull(this.template.getRuleset())) {
+            return true;
+        }
+        Helper.setErrorMessage(ERROR_INCOMPLETE_DATA, "templateRulesetEmpty");
+        return false;
+    }
+
+    private boolean isDocketValid() {
+        if (Objects.nonNull(this.template.getDocket())) {
+            return true;
+        }
+        Helper.setErrorMessage(ERROR_INCOMPLETE_DATA, "templateDocketEmpty");
+        return false;
     }
 
     private boolean isTitleValid() {
