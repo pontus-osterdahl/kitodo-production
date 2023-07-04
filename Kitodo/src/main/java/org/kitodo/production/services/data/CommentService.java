@@ -11,6 +11,8 @@
 
 package org.kitodo.production.services.data;
 
+import java.io.IOException;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -24,7 +26,7 @@ import org.kitodo.data.database.persistence.CommentDAO;
 import org.kitodo.production.services.ServiceManager;
 import org.kitodo.production.services.data.base.SearchDatabaseService;
 import org.primefaces.model.SortOrder;
-import java.io.IOException;
+
 
 import org.kitodo.data.exceptions.DataException;
 
