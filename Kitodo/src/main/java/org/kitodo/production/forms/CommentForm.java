@@ -72,6 +72,7 @@ public class CommentForm extends BaseForm {
             e.printStackTrace();
         }
     }
+
     /**
      * Set process by ID.
      *
@@ -173,7 +174,7 @@ public class CommentForm extends BaseForm {
         }
         return null;
     }
-    
+
     /**
      * Saves the edited comment to database.
      */
