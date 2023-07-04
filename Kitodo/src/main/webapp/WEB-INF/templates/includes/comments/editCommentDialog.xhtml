@@ -46,11 +46,10 @@
                     <!-- Cancel -->
                     <p:commandButton styleClass="secondary dialog"
                                      value="#{msgs.cancel}"
-                                     action="#{CommentForm.resetEditedComment()}"
+                                     action="#{CommentForm.setEditedComment(null)}"
                                      icon="fa fa-times fa-lg"
                                      iconPos="right"
                                      onclick="PF('editCommentDialog').hide()">
-                        <f:actionListener binding="#{CommentForm.setEditedComment(null)}"/>
                     </p:commandButton>
                 </span>                
             </h:form>
