@@ -43,6 +43,17 @@
                             title="#{msgs['dataEditor.comment.markCorrectionCommentAsSolved']}"
                             action="#{CommentForm.solveProblem(item)}">
                     </p:commandButton>
+                    <p:commandButton id="editButton"
+                           action="#{CommentForm.setEditedComment(item)}"
+                           oncomplete="PF('editCommentDialog').show()"
+                           rendered="#{item.type ne 'ERROR'}"
+                           icon="fa fa-edit"
+                           styleClass="secondary right"
+                           title="#{msgs.commentEdit}"
+                           immediate="true"
+                           update=":editCommentForm">
+                        <p:resetInput target=":editCommentForm"/>
+                    </p:commandButton>
                 </p:column>
             </p:dataTable>
 
