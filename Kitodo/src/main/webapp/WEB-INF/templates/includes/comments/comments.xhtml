@@ -43,7 +43,6 @@
                             title="#{msgs['dataEditor.comment.markCorrectionCommentAsSolved']}"
                             action="#{CommentForm.solveProblem(item)}">
                     </p:commandButton>
-                    <h:panelGroup 
                     <p:commandButton id="editButton"
                            rendered="#{(item.type ne 'ERROR')}"
                            action="#{CommentForm.setEditedComment(item)}"
