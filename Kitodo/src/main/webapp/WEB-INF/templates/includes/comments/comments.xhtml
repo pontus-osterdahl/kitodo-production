@@ -43,7 +43,9 @@
                             title="#{msgs['dataEditor.comment.markCorrectionCommentAsSolved']}"
                             action="#{CommentForm.solveProblem(item)}">
                     </p:commandButton>
+                    <h:panelGroup 
                     <p:commandButton id="editButton"
+                           rendered="#{(item.type ne 'ERROR')}"
                            action="#{CommentForm.setEditedComment(item)}"
                            oncomplete="PF('editCommentDialog').show()"
                            rendered="#{item.type ne 'ERROR'}"
@@ -53,6 +55,15 @@
                            immediate="true"
                            update=":editCommentForm">
                         <p:resetInput target=":editCommentForm"/>
+                    </p:commandButton>
+                    <p:commandButton
+                            rendered="#{item.type ne 'ERROR'}"
+                            icon="fa fa-trash"
+                            update="#{request.requestURI.contains('metadataEditor') ? 'commentsBox:commentsGrid commentsNumberWrapper' : 'tasksTabView:commentsBox:commentsGrid tasksTabView:commentsNumberWrapper'}"
+                            styleClass="secondary right"
+                            immediate="true"
+                            title="#{msgs.commentDelete}"
+                            action="#{CommentForm.removeComment(item)}">
                     </p:commandButton>
                 </p:column>
             </p:dataTable>
