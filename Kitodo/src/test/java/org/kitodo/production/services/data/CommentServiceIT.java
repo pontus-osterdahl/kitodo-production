@@ -60,7 +60,7 @@ public class CommentServiceIT {
 
     /**
      * Tests wether comment is correctly saved and removed from database.
-     * @throws Exception when saving of dummy or test processes fails.
+     * @throws Exception when saving or deleting comment fails.
      */
     @Test
     public void shouldSaveAndRemoveInfoComment() throws Exception {
