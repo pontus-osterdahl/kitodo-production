@@ -43,20 +43,20 @@
                             title="#{msgs['dataEditor.comment.markCorrectionCommentAsSolved']}"
                             action="#{CommentForm.solveProblem(item)}">
                     </p:commandButton>
-                    <h:panelGroup
-                        rendered="#{item.type ne 'ERROR' and rowIdx == 0}">
                     <p:commandButton id="editButton"
                            action="#{CommentForm.setEditedComment(item)}"
                            oncomplete="PF('editCommentDialog').show()"
                            icon="fa fa-edit"
                            styleClass="secondary right"
                            title="#{msgs.commentEdit}"
+                           rendered="#{item.type ne 'ERROR' and rowIdx == 0}"
                            disabled="#{item.author.id != LoginForm.loggedUser.id}"
                            immediate="true"
                            update=":editCommentForm">
                         <p:resetInput target=":editCommentForm"/>
                     </p:commandButton>
                     <p:commandButton
+                            rendered="#{item.type ne 'ERROR' and rowIdx == 0}"
                             disabled="#{item.author.id != LoginForm.loggedUser.id}"
                             icon="fa fa-trash"
                             update="#{request.requestURI.contains('metadataEditor') ? 'commentsBox:commentsGrid commentsNumberWrapper' : 'tasksTabView:commentsBox:commentsGrid tasksTabView:commentsNumberWrapper'}"
@@ -65,7 +65,6 @@
                             title="#{msgs.commentDelete}"
                             action="#{CommentForm.removeComment(item)}">
                     </p:commandButton>
-                    </h:panelGroup>
                 </p:column>
             </p:dataTable>
 
