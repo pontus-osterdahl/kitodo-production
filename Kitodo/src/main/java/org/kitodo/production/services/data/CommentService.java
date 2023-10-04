@@ -11,6 +11,7 @@
 
 package org.kitodo.production.services.data;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -18,8 +19,11 @@ import java.util.Objects;
 import org.kitodo.data.database.beans.Comment;
 import org.kitodo.data.database.beans.Process;
 import org.kitodo.data.database.beans.Task;
+import org.kitodo.data.database.beans.User;
 import org.kitodo.data.database.exceptions.DAOException;
 import org.kitodo.data.database.persistence.CommentDAO;
+import org.kitodo.data.exceptions.DataException;
+import org.kitodo.production.services.ServiceManager;
 import org.kitodo.production.services.data.base.SearchDatabaseService;
 import org.primefaces.model.SortOrder;
 
@@ -90,5 +94,15 @@ public class CommentService extends SearchDatabaseService<Comment, CommentDAO> {
      */
     public void saveList(List<Comment> list) throws DAOException {
         dao.saveList(list);
+    }
+    
+    /**
+     * Remove comment from database and resolve associations.
+     * 
+     * @param comment to be removed.
+     */
+    public static void removeComment(Comment comment) throws DAOException {
+        comment.getProcess().getComments().remove(comment);
+        ServiceManager.getCommentService().removeFromDatabase(comment);
     }
 }

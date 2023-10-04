@@ -44,6 +44,7 @@ import org.kitodo.production.services.workflow.WorkflowControllerService;
 public class CommentForm extends BaseForm {
     private static final Logger logger = LogManager.getLogger(CommentForm.class);
     private boolean correctionComment = false;
+    private Comment editedComment = null;
     private String commentMessage;
     private String correctionTaskId;
     private Task currentTask;
@@ -58,6 +59,20 @@ public class CommentForm extends BaseForm {
      */
     public Process getProcess() {
         return process;
+    }
+
+    /**
+     * Remove a given comment.
+     * 
+     * @param comment to be removed.
+     */
+    public void removeComment(Comment comment) {
+        try {
+            ServiceManager.getCommentService().removeComment(comment);
+        } catch (DAOException e) {
+            Helper.setErrorMessage(ERROR_DELETING, new Object[]{ObjectType.COMMENT.getTranslationSingular()},
+                    logger, e);
+        }
     }
 
     /**
@@ -104,6 +119,24 @@ public class CommentForm extends BaseForm {
     }
 
     /**
+     * Set's edited comment.
+     * 
+     * @param comment to be set as editedComment.
+     */
+    public void setEditedComment(Comment comment) {
+        this.editedComment = comment;
+    }
+    
+    /**
+     * Returns edited comment.
+     * 
+     * @return edited comment.
+     */
+    public Comment getEditedComment() {
+        return this.editedComment;
+    }
+    
+    /**
      * Add a new comment to the process.
      */
     public String addComment() {
@@ -142,6 +175,20 @@ public class CommentForm extends BaseForm {
             return MessageFormat.format(REDIRECT_PATH, "tasks");
         }
         return null;
+    }
+
+    /**
+     * Saves the edited comment to database.
+     */
+    public void saveEditedComment() {
+        if (Objects.nonNull(this.editedComment) && this.editedComment.getType().equals(CommentType.INFO)) {
+            try {
+                ServiceManager.getCommentService().saveToDatabase(this.editedComment);
+            } catch (DAOException e) {
+                Helper.setErrorMessage(ERROR_SAVING, logger, e);
+            }
+        }
+        this.editedComment = null;
     }
 
     /**
