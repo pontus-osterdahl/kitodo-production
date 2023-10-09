@@ -64,28 +64,31 @@ public class CommentForm extends BaseForm {
     /**
      * Remove a given comment.
      * 
-     * @param comment to be removed.
+     * @param comment
+     *            to be removed.
      */
     public void removeComment(Comment comment) {
         try {
             ServiceManager.getCommentService().removeComment(comment);
-        } catch (DAOException e) {
-            Helper.setErrorMessage(ERROR_DELETING, new Object[]{ObjectType.COMMENT.getTranslationSingular()},
-                    logger, e);
+            saveProcessToIndex();
+        } catch (DAOException | CustomResponseException | DataException | IOException e) {
+            Helper.setErrorMessage(ERROR_DELETING, new Object[] {ObjectType.COMMENT.getTranslationSingular() }, logger,
+                e);
         }
     }
 
     /**
      * Set process by ID.
      *
-     * @param processId process ID
+     * @param processId
+     *            process ID
      */
     public void setProcessById(int processId) {
         try {
             this.process = ServiceManager.getProcessService().getById(processId);
         } catch (DAOException e) {
-            Helper.setErrorMessage("errorLoadingOne", new Object[] {ObjectType.PROCESS.getTranslationSingular(),
-                processId}, logger, e);
+            Helper.setErrorMessage("errorLoadingOne",
+                new Object[] {ObjectType.PROCESS.getTranslationSingular(), processId }, logger, e);
         }
     }
 
@@ -112,7 +115,8 @@ public class CommentForm extends BaseForm {
     /**
      * Set comment's message.
      *
-     * @param commentMessage String
+     * @param commentMessage
+     *            String
      */
     public void setCommentMessage(String commentMessage) {
         this.commentMessage = commentMessage;
@@ -121,12 +125,13 @@ public class CommentForm extends BaseForm {
     /**
      * Set's edited comment.
      * 
-     * @param comment to be set as editedComment.
+     * @param comment
+     *            to be set as editedComment.
      */
     public void setEditedComment(Comment comment) {
         this.editedComment = comment;
     }
-    
+
     /**
      * Returns edited comment.
      * 
@@ -135,7 +140,16 @@ public class CommentForm extends BaseForm {
     public Comment getEditedComment() {
         return this.editedComment;
     }
-    
+
+    private void saveProcessToIndex() throws DAOException, CustomResponseException, DataException, IOException {
+        ServiceManager.getProcessService().saveToIndex(this.process, true);
+        for (Task task : this.process.getTasks()) {
+            // update tasks in elastic search index, which includes correction
+            // comment status
+            ServiceManager.getTaskService().saveToIndex(task, true);
+        }
+    }
+
     /**
      * Add a new comment to the process.
      */
@@ -147,10 +161,11 @@ public class CommentForm extends BaseForm {
         comment.setProcess(this.process);
         if (isCorrectionComment()) {
             try {
-                comment.setCorrectionTask(ServiceManager.getTaskService().getById(Integer.parseInt(getCorrectionTaskId())));
+                comment.setCorrectionTask(
+                    ServiceManager.getTaskService().getById(Integer.parseInt(getCorrectionTaskId())));
             } catch (NumberFormatException | DAOException e) {
-                Helper.setErrorMessage(ERROR_LOADING_ONE, new Object[]{ObjectType.TASK.getTranslationSingular(), getCorrectionTaskId()},
-                        logger, e);
+                Helper.setErrorMessage(ERROR_LOADING_ONE,
+                    new Object[] {ObjectType.TASK.getTranslationSingular(), getCorrectionTaskId() }, logger, e);
                 return null;
             }
             comment.setType(CommentType.ERROR);
@@ -161,11 +176,7 @@ public class CommentForm extends BaseForm {
         }
         try {
             ServiceManager.getCommentService().saveToDatabase(comment);
-            ServiceManager.getProcessService().saveToIndex(this.process, true);
-            for (Task task : this.process.getTasks()) {
-                // update tasks in elastic search index, which includes correction comment status 
-                ServiceManager.getTaskService().saveToIndex(task, true);
-            }
+            saveProcessToIndex();
         } catch (DAOException | CustomResponseException | DataException | IOException e) {
             Helper.setErrorMessage(ERROR_SAVING, logger, e);
         }
@@ -184,7 +195,8 @@ public class CommentForm extends BaseForm {
         if (Objects.nonNull(this.editedComment) && this.editedComment.getType().equals(CommentType.INFO)) {
             try {
                 ServiceManager.getCommentService().saveToDatabase(this.editedComment);
-            } catch (DAOException e) {
+                saveProcessToIndex();
+            } catch (DAOException | CustomResponseException | DataException | IOException e) {
                 Helper.setErrorMessage(ERROR_SAVING, logger, e);
             }
         }
@@ -226,7 +238,8 @@ public class CommentForm extends BaseForm {
     /**
      * Set correction comment.
      *
-     * @param correctionComment as boolean
+     * @param correctionComment
+     *            as boolean
      */
     public void setCorrectionComment(boolean correctionComment) {
         this.correctionComment = correctionComment;
@@ -244,7 +257,8 @@ public class CommentForm extends BaseForm {
     /**
      * Set correctionTaskId.
      *
-     * @param correctionTaskId as java.lang.String
+     * @param correctionTaskId
+     *            as java.lang.String
      */
     public void setCorrectionTaskId(String correctionTaskId) {
         this.correctionTaskId = correctionTaskId;
@@ -258,9 +272,8 @@ public class CommentForm extends BaseForm {
         if (currentTaskOptions.isEmpty()) {
             return Collections.emptyList();
         } else {
-            return ServiceManager.getTaskService().getPreviousTasksForProblemReporting(
-                    currentTaskOptions.get(0).getOrdering(),
-                    this.process.getId());
+            return ServiceManager.getTaskService()
+                    .getPreviousTasksForProblemReporting(currentTaskOptions.get(0).getOrdering(), this.process.getId());
         }
     }
 
@@ -286,9 +299,10 @@ public class CommentForm extends BaseForm {
      */
     public String solveProblemForAllBatchProcesses(Comment comment) {
         for (Task task : batchHelper.getSteps()) {
-            for (Comment processComment : ServiceManager.getCommentService().getAllCommentsByProcess(task.getProcess())) {
-                if (!processComment.isCorrected() && verifyCorrectionTasks(comment.getCorrectionTask(),
-                        processComment.getCorrectionTask())) {
+            for (Comment processComment : ServiceManager.getCommentService()
+                    .getAllCommentsByProcess(task.getProcess())) {
+                if (!processComment.isCorrected()
+                        && verifyCorrectionTasks(comment.getCorrectionTask(), processComment.getCorrectionTask())) {
                     solveProblem(processComment);
                 }
             }
@@ -300,17 +314,16 @@ public class CommentForm extends BaseForm {
      * Verify whether both correction tasks are null or share identical titles.
      *
      * @param commentCorrectionTask
-     *         The comment correction task
+     *            The comment correction task
      * @param processCommentCorrectionTask
-     *         The process comment correction task
+     *            The process comment correction task
      * @return True if they are null or have equal titles
      */
     private static boolean verifyCorrectionTasks(Task commentCorrectionTask, Task processCommentCorrectionTask) {
         if (Objects.isNull(commentCorrectionTask) && Objects.isNull(processCommentCorrectionTask)) {
             return true;
-        } else if (Objects.isNull(commentCorrectionTask) && Objects.nonNull(
-                processCommentCorrectionTask) || Objects.nonNull(commentCorrectionTask) && Objects.isNull(
-                processCommentCorrectionTask)) {
+        } else if (Objects.isNull(commentCorrectionTask) && Objects.nonNull(processCommentCorrectionTask)
+                || Objects.nonNull(commentCorrectionTask) && Objects.isNull(processCommentCorrectionTask)) {
             return false;
         }
         return processCommentCorrectionTask.getTitle().equals(commentCorrectionTask.getTitle());
@@ -319,7 +332,8 @@ public class CommentForm extends BaseForm {
     /**
      * refresh the process in the session.
      *
-     * @param process Object process to refresh
+     * @param process
+     *            Object process to refresh
      */
     private void refreshProcess(Process process) {
         try {
@@ -330,8 +344,8 @@ public class CommentForm extends BaseForm {
             }
         } catch (DAOException e) {
             Helper.setErrorMessage(ERROR_LOADING_ONE,
-                    new Object[] {ObjectType.PROCESS.getTranslationSingular(), this.currentTask.getProcess().getId()},
-                    logger, e);
+                new Object[] {ObjectType.PROCESS.getTranslationSingular(), this.currentTask.getProcess().getId() },
+                logger, e);
         }
     }
 
@@ -339,22 +353,23 @@ public class CommentForm extends BaseForm {
      * Set current task by ID.
      *
      * @param taskId
-     *          ID of task to set
+     *            ID of task to set
      */
     public void setCurrentTaskById(int taskId) {
         try {
             this.currentTask = ServiceManager.getTaskService().getById(taskId);
             this.setProcessById(this.currentTask.getProcess().getId());
         } catch (DAOException e) {
-            Helper.setErrorMessage(ERROR_LOADING_ONE,
-                    new Object[] {ObjectType.TASK.getTranslationSingular(), taskId}, logger, e);
+            Helper.setErrorMessage(ERROR_LOADING_ONE, new Object[] {ObjectType.TASK.getTranslationSingular(), taskId },
+                logger, e);
         }
     }
 
     /**
      * Set batchHelper.
      *
-     * @param batchHelper as org.kitodo.production.helper.batch.BatchTaskHelper
+     * @param batchHelper
+     *            as org.kitodo.production.helper.batch.BatchTaskHelper
      */
     public void setBatchHelper(BatchTaskHelper batchHelper) {
         this.batchHelper = batchHelper;
@@ -380,13 +395,15 @@ public class CommentForm extends BaseForm {
      * @return whether there are concurrent tasks in work or not
      */
     public boolean isConcurrentTaskInWork() {
-        return !TaskService.getTasksInWorkByOtherUsers(
-                TaskService.getConcurrentTasksOpenOrInWork(this.process, this.currentTask)).isEmpty();
+        return !TaskService
+                .getTasksInWorkByOtherUsers(TaskService.getConcurrentTasksOpenOrInWork(this.process, this.currentTask))
+                .isEmpty();
     }
 
     /**
-     * Check and return whether 'correction' flag is set to true for any task of the current process,
-     * e.g. if process is currently in a correction workflow.
+     * Check and return whether 'correction' flag is set to true for any task of
+     * the current process, e.g. if process is currently in a correction
+     * workflow.
      *
      * @return whether process is in correction workflow or not
      */
@@ -404,7 +421,8 @@ public class CommentForm extends BaseForm {
     }
 
     /**
-     * Compute and return list of tasks that are eligible as 'currentTask' for a new correction comment.
+     * Compute and return list of tasks that are eligible as 'currentTask' for a
+     * new correction comment.
      *
      * @return list of current task options for new correction comment
      */
@@ -424,7 +442,8 @@ public class CommentForm extends BaseForm {
     /**
      * Set currentTask.
      *
-     * @param currentTask as org.kitodo.data.database.beans.Task
+     * @param currentTask
+     *            as org.kitodo.data.database.beans.Task
      */
     public void setCurrentTask(Task currentTask) {
         this.currentTask = currentTask;
@@ -434,16 +453,17 @@ public class CommentForm extends BaseForm {
      * Check and return whether the process has any correction comments or not.
      *
      * @param processId
-     *          identifier of process to check
-     * @return 0, if process has no correction comment
-     *         1, if process has correction comments that are all corrected
-     *         2, if process has at least one open correction comment
+     *            identifier of process to check
+     * @return 0, if process has no correction comment 1, if process has
+     *         correction comments that are all corrected 2, if process has at
+     *         least one open correction comment
      */
     public int hasCorrectionComment(int processId) {
         try {
             return ProcessService.hasCorrectionComment(processId).getValue();
         } catch (DAOException e) {
-            Helper.setErrorMessage(ERROR_LOADING_ONE, new Object[] {ObjectType.PROCESS.getTranslationSingular(), processId }, logger, e);
+            Helper.setErrorMessage(ERROR_LOADING_ONE,
+                new Object[] {ObjectType.PROCESS.getTranslationSingular(), processId }, logger, e);
             return 0;
         }
     }
@@ -465,8 +485,7 @@ public class CommentForm extends BaseForm {
      */
     public String getTaskCloseLinkText() {
         if (isCorrectionWorkflow()) {
-            return Helper.getTranslation("closeTask") + " (" + Helper.getTranslation("correctionWorkflow")
-                    + ")";
+            return Helper.getTranslation("closeTask") + " (" + Helper.getTranslation("correctionWorkflow") + ")";
         } else {
             return Helper.getTranslation("closeTask");
         }
