@@ -144,7 +144,7 @@ public class CommentForm extends BaseForm {
             ServiceManager.getTaskService().saveToIndex(task, true);
         }
     }
-    
+
     /**
      * Add a new comment to the process.
      */
