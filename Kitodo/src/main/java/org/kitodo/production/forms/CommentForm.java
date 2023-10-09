@@ -190,7 +190,7 @@ public class CommentForm extends BaseForm {
             try {
                 ServiceManager.getCommentService().saveToDatabase(this.editedComment);
                 saveProcessAndTasksToIndex();
-            catch (CustomResponseException | DAOException | DataException | IOException e) {
+            } catch (CustomResponseException | DAOException | DataException | IOException e) {
                 Helper.setErrorMessage(ERROR_SAVING, logger, e);
             }
         }
