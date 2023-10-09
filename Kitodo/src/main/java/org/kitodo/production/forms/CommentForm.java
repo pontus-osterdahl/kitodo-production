@@ -70,7 +70,7 @@ public class CommentForm extends BaseForm {
         try {
             ServiceManager.getCommentService().removeComment(comment);
             saveProcessAndTasksToIndex();
-        } catch (DAOException | CustomResponseException | DataException | IOException e) {
+        } catch (CustomResponseException | DAOException | DataException | IOException e) {
             Helper.setErrorMessage(ERROR_DELETING, new Object[]{ObjectType.COMMENT.getTranslationSingular()},
                     logger, e);
         }
@@ -171,7 +171,7 @@ public class CommentForm extends BaseForm {
         try {
             ServiceManager.getCommentService().saveToDatabase(comment);
             saveProcessAndTasksToIndex();
-        } catch (DAOException | CustomResponseException | DataException | IOException e) {
+        catch (CustomResponseException | DAOException | DataException | IOException e) {
             Helper.setErrorMessage(ERROR_SAVING, logger, e);
         }
         newComment(false);
@@ -190,7 +190,7 @@ public class CommentForm extends BaseForm {
             try {
                 ServiceManager.getCommentService().saveToDatabase(this.editedComment);
                 saveProcessAndTasksToIndex();
-            } catch (DAOException | CustomResponseException | DataException | IOException e) {
+            catch (CustomResponseException | DAOException | DataException | IOException e) {
                 Helper.setErrorMessage(ERROR_SAVING, logger, e);
             }
         }
