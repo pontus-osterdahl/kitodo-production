@@ -77,6 +77,30 @@
                                            requiredMessage="#{msgs.paginationStartValueNotSpecified}"/>
                         </div>
                         <div>
+                            <p:commandButton
+                                rendered="#{DataEditorForm.paginationPanel.paginationTypeSelectSelectedItem eq 'ADVANCED'}"
+                                styleClass="secondary"
+                                style="margin-right: 2px; margin-bottom: 2px; "
+                                value="Als Seitenbezeichnung verwenden"
+                                title="Als Seitenbezeichnung verwenden"
+                                onclick="return writeToPaginationStartValuePageLabelWrapper()"
+                            />
+                            <p:outputLabel
+                                           rendered="#{DataEditorForm.paginationPanel.paginationTypeSelectSelectedItem eq 'ADVANCED'}"
+                                           value="Seitenbezeichnungen"
+                                           for="selectPageLabel"/>
+                            <p:selectOneMenu id="selectPageLabel"
+                                rendered="#{DataEditorForm.paginationPanel.paginationTypeSelectSelectedItem eq 'ADVANCED'}"
+                                disabled="#{not SecurityAccessController.hasAuthorityToEditProcessPagination()}"
+                                autoWidth="false"
+                                value="#{DataEditorForm.paginationPanel.selectedPageLabelItem}">
+                                <f:selectItems value="#{DataEditorForm.paginationPanel.pageLabelItems}"
+                                    var="scope"
+                                    itemValue="#{scope.key}"
+                                    itemLabel="#{scope.value}"/>
+                            </p:selectOneMenu>
+                        </div>
+                       <div>
                             <!-- Advanced pagination -->
                             <script type="text/javascript">
                                 function writeToPaginationStartValue(before, after) {
@@ -93,6 +117,13 @@
                                     textbox.focus();
                                     return false;
                                 }
+
+                                function writeToPaginationStartValuePageLabelWrapper() {
+                                    var textbox = document.getElementById("paginationForm:selectPageLabel_input");
+                                    var text = textbox.options[textbox.selectedIndex].value;
+                                    return writeToPaginationStartValue("`" + text, "` ");
+                                }
+                                    
                             </script>
                             <p:commandButton
                                 rendered="#{DataEditorForm.paginationPanel.paginationTypeSelectSelectedItem eq 'ADVANCED'}"
