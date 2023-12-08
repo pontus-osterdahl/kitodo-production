@@ -110,6 +110,9 @@ public class User extends BaseBean {
 
     @Column(name = "show_pagination_by_default")
     private boolean showPaginationByDefault;
+    
+    @Column(name = "pagination_scope_by_default")
+    private boolean paginationScopeByDefault;
 
     /**
      * Constructor for User Entity.
@@ -146,6 +149,7 @@ public class User extends BaseBean {
         this.shortcuts = user.shortcuts;
         this.showCommentsByDefault = user.showCommentsByDefault;
         this.showPaginationByDefault = user.showPaginationByDefault;
+        this.paginationScopeByDefault = user.paginationScopeByDefault;
         this.defaultGalleryViewMode = user.defaultGalleryViewMode;
 
         if (user.roles != null) {
@@ -492,6 +496,26 @@ public class User extends BaseBean {
     public void setShowPaginationByDefault(boolean showPaginationByDefault) {
         this.showPaginationByDefault = showPaginationByDefault;
     }
+    
+    /**
+     * Get paginationScopeByDefault.
+     * 
+     * @return value of paginationScopeByDefault
+     */
+    public boolean isPaginationScopeByDefault() {
+        return paginationScopeByDefault;
+    }
+    
+    /**
+     * Set paginationScopeByDefault.
+     * 
+     * @param paginationScopeByDefault as boolean
+     */
+    public void setPaginationScopeByDefault(boolean paginationScopeByDefault) {
+        this.paginationScopeByDefault = paginationScopeByDefault;
+    }
+    
+    
 
     /**
      * Removes a user from the environment. Since the
