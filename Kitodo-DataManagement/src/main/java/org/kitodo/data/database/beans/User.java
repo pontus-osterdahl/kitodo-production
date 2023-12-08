@@ -176,7 +176,6 @@ public class User extends BaseBean {
             this.filters = user.filters;
         }
 
-        // default values
         if (Objects.nonNull(user.tableSize)) {
             this.tableSize = user.tableSize;
         }
@@ -496,7 +495,7 @@ public class User extends BaseBean {
     public void setShowPaginationByDefault(boolean showPaginationByDefault) {
         this.showPaginationByDefault = showPaginationByDefault;
     }
-    
+
     /**
      * Get paginationScopeByDefault.
      * 
@@ -514,8 +513,6 @@ public class User extends BaseBean {
     public void setPaginationScopeByDefault(boolean paginationScopeByDefault) {
         this.paginationScopeByDefault = paginationScopeByDefault;
     }
-    
-    
 
     /**
      * Removes a user from the environment. Since the
