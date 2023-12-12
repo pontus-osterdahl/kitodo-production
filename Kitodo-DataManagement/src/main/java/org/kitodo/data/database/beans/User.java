@@ -149,7 +149,7 @@ public class User extends BaseBean {
         this.shortcuts = user.shortcuts;
         this.showCommentsByDefault = user.showCommentsByDefault;
         this.showPaginationByDefault = user.showPaginationByDefault;
-        this.paginateFromFirstPageByDefault= user.paginateFromFirstPageByDefault;
+        this.paginateFromFirstPageByDefault = user.paginateFromFirstPageByDefault;
         this.defaultGalleryViewMode = user.defaultGalleryViewMode;
 
         if (user.roles != null) {
