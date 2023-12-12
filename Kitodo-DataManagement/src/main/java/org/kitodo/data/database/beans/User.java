@@ -110,9 +110,9 @@ public class User extends BaseBean {
 
     @Column(name = "show_pagination_by_default")
     private boolean showPaginationByDefault;
-    
-    @Column(name = "pagination_scope_by_default")
-    private boolean paginationScopeByDefault;
+
+    @Column(name = "paginate_from_first_page_by_default")
+    private boolean paginateFromFirstPageByDefault;
 
     /**
      * Constructor for User Entity.
