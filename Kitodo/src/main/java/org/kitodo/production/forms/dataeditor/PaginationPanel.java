@@ -271,7 +271,7 @@ public class PaginationPanel {
 
     private void prepareSelectPaginationScopeSelectedItem() {
         selectPaginationScopeSelectedItem = ServiceManager.getUserService().getCurrentUser()
-                .isPaginationScopeByDefault();
+                .isPaginateFromFirstPageByDefault();
     }
 
     private void preparePaginationSelectionItems() {
