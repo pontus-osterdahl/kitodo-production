@@ -149,7 +149,7 @@ public class User extends BaseBean {
         this.shortcuts = user.shortcuts;
         this.showCommentsByDefault = user.showCommentsByDefault;
         this.showPaginationByDefault = user.showPaginationByDefault;
-        this.paginationScopeByDefault = user.paginationScopeByDefault;
+        this.paginateFromFirstPageByDefault= user.paginateFromFirstPageByDefault;
         this.defaultGalleryViewMode = user.defaultGalleryViewMode;
 
         if (user.roles != null) {
@@ -497,21 +497,21 @@ public class User extends BaseBean {
     }
 
     /**
-     * Get paginationScopeByDefault.
+     * Get paginateFromFirstPageByDefault.
      * 
-     * @return value of paginationScopeByDefault
+     * @return value of paginateFromFirstPageByDefault
      */
-    public boolean isPaginationScopeByDefault() {
-        return paginationScopeByDefault;
+    public boolean isPaginateFromFirstPageByDefault() {
+        return paginateFromFirstPageByDefault;
     }
     
     /**
-     * Set paginationScopeByDefault.
+     * Set paginateFromFirstPageByDefault.
      * 
-     * @param paginationScopeByDefault as boolean
+     * @param paginateFromFirstPageByDefault as boolean
      */
-    public void setPaginationScopeByDefault(boolean paginationScopeByDefault) {
-        this.paginationScopeByDefault = paginationScopeByDefault;
+    public void setPaginateFromFirstPageByDefault(boolean paginateFromFirstPageByDefault) {
+        this.paginateFromFirstPageByDefault = paginateFromFirstPageByDefault;
     }
 
     /**
